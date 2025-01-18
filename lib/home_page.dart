@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lg_manager/lg_connection_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,11 +17,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset('assets/images/lglogo.jpg', height: 30), // LG logo
+            Image.asset('assets/images/lglogo.jpg', height: 30),
             const SizedBox(width: 10),
             const Text('LG Visual Manager'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LGConnectionPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
