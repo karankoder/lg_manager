@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lg_manager/lg_connection_page.dart';
+import 'package:lg_manager/utility/config.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +11,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? selectedScreen;
+  bool connectionStatus = AppConfig.ssh.connected;
+  bool isSystemTab = true;
 
   @override
   Widget build(BuildContext context) {
@@ -26,42 +29,54 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const LGConnectionPage()),
-              );
+              setState(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const LGConnectionPage()),
+                );
+              });
             },
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(30.0),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Status: ',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  AppConfig.ssh.connected ? 'Connected' : 'Disconnected',
+                  style: TextStyle(
+                    color: AppConfig.ssh.connected ? Colors.green : Colors.red,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Effortless control for your LG setup',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  children: [
-                    _buildManageLogosCard(),
-                    _buildSendKMLsCard(),
-                    _buildClearLogosCard(),
-                    _buildClearKMLsCard(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            _buildTabs(),
+            const SizedBox(height: 16),
+            Expanded(
+              child:
+                  isSystemTab ? _buildSystemControls() : _buildManageControls(),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -76,154 +91,278 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildManageLogosCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Manage Logos',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Display logo logic
-              },
-              child: const Text('Display Logo'),
-            ),
-          ],
+  Widget _buildTabs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildTabButton('System', isSystemTab),
+        _buildTabButton('Manage', !isSystemTab),
+      ],
+    );
+  }
+
+  Widget _buildTabButton(String title, bool isActive) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isSystemTab = title == 'System';
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.blueAccent : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.grey,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSendKMLsCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Send KML Files',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                // Send KML 1 logic
-              },
-              child: const Text('KML 1'),
+  Widget _buildSystemControls() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          const Text(
+            'System Controls',
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            children: [
+              _buildButton(
+                onPressed: () {
+                  setState(() {});
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Relaunch'),
+                color: const Color(0xFF3B83F6),
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () {
+                  _showConfirmationDialog(
+                    context,
+                    'Reboot',
+                    'Are you sure you want to reboot?',
+                    () {
+                      // Reboot logic
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+                icon: const Icon(Icons.restart_alt),
+                label: const Text('Reboot'),
+                color: const Color(0xFFF55347), // Red
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () {
+                  _showConfirmationDialog(
+                    context,
+                    'Power Off',
+                    'Are you sure you want to power off?',
+                    () {
+                      // Power Off logic
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+                icon: const Icon(Icons.power_settings_new),
+                label: const Text('Power Off'),
+                color: const Color(0xFFF9C440), // Yellow
+              ),
+              const SizedBox(height: 20),
+              _buildButton(
+                onPressed: () {
+                  // Set Refresh logic
+                },
+                icon: const Icon(Icons.update),
+                label: const Text('Set Refresh'),
+                color: const Color(0xFF3B83F6), // Blue
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () {
+                  // Reset Refresh logic
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reset Refresh'),
+                color: const Color(0xFF4CAF50), // Green
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManageControls() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .scaffoldBackgroundColor, // Match card color to background color
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Control KML and logos',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black), // Changed text color to black
+          ),
+          const SizedBox(height: 20),
+          Column(
+            children: [
+              _buildButton(
+                onPressed: () async {
+                  await AppConfig.lg.getScreenAmount();
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Set LG Logo'),
+                color: const Color(0xFF3B83F6), // Blue
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () {
+                  // Remove LG Logo logic
+                },
+                icon: const Icon(Icons.clear),
+                label: const Text('Clear Logos'),
+                color: const Color(0xFFF55347), // Red
+              ),
+              const SizedBox(height: 20),
+              _buildButton(
+                onPressed: () {
+                  // Send KML 1 logic
+                },
+                icon: const Icon(Icons.send),
+                label: const Text('Send KML 1'),
+                color: const Color(0xFFF9C440), // Yellow
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () {
+                  // Send KML 2 logic
+                },
+                icon: const Icon(Icons.send),
+                label: const Text('Send KML 2'),
+                color: const Color(0xFF3B83F6), // Blue
+              ),
+              const SizedBox(height: 20),
+              _buildButton(
+                onPressed: () {
+                  // Clear KMLs logic
+                },
+                icon: const Icon(Icons.clear),
+                label: const Text('Clear KMLs'),
+                color: const Color(0xFF4CAF50), // Red
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(
+      {required VoidCallback onPressed,
+      required Icon icon,
+      required Text label,
+      required Color color}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          vertical: 8.0), // Add padding around the buttons
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width *
+            0.7, // Set width to 70% of screen width
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            shape: RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(30), // Make corners more circular
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Send KML 2 logic
-              },
-              child: const Text('KML 2'),
-            ),
-          ],
+            padding: const EdgeInsets.symmetric(
+                vertical: 12.0, horizontal: 16.0), // Add left and right padding
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.data!,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white), // Font size and text color
+              ),
+              Icon(icon.icon,
+                  size: 24,
+                  color: Colors.white), // Increase icon size and color
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildClearLogosCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Clear Displayed Logos',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            ElevatedButton(
+  void _showConfirmationDialog(
+    BuildContext context,
+    String title,
+    String content,
+    VoidCallback onConfirm,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Clear Logos'),
-                      content: const Text(
-                          'Are you sure you want to clear all displayed logos?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Clear logos logic
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                Navigator.of(context).pop();
               },
-              child: const Text('Clear Logos'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: onConfirm,
+              child: const Text('Confirm'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildClearKMLsCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Clear Active KMLs',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Clear KMLs'),
-                      content: const Text(
-                          'Are you sure you want to clear all active KMLs?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Clear KMLs logic
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Text('Clear KMLs'),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

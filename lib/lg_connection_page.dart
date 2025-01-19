@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'services/ssh_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './utility/config.dart';
 
 class LGConnectionPage extends StatefulWidget {
   const LGConnectionPage({super.key});
@@ -20,10 +20,6 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConnecting = false;
-  String? _statusMessage;
-
-  bool connectionStatus = false;
-  late SSHService ssh;
 
   Future<void> _loadSettings() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -56,17 +52,7 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
     setState(() {
       _isConnecting = true;
     });
-    print('connecting');
-    bool? result = await ssh.connect();
-    setState(() {
-      connectionStatus = result!;
-    });
-
-    if (result!) {
-      print('Connected to LG');
-    } else {
-      print('Failed to connect to LG');
-    }
+    await AppConfig.ssh.connect();
     setState(() {
       _isConnecting = false;
     });
@@ -75,7 +61,6 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
   @override
   void initState() {
     super.initState();
-    ssh = SSHService();
     _loadSettings();
     _connectToLG();
   }
@@ -223,7 +208,7 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
                                   try {
                                     await _saveSettings();
                                     _connectToLG();
-                                    showSnackBar(connectionStatus
+                                    showSnackBar(AppConfig.ssh.connected
                                         ? 'Connected successfully!'
                                         : 'Connection failed!');
                                   } on TimeoutException catch (_) {
@@ -237,18 +222,21 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
                           child: const Text('Connect to LG Rig'),
                         ),
                       ),
-                      if (_statusMessage != null) ...[
-                        const SizedBox(height: 20),
-                        Center(
-                          child: Text(
-                            _statusMessage!,
-                            style: TextStyle(
-                              color: _isConnecting ? Colors.blue : Colors.red,
-                              fontSize: 16,
-                            ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          AppConfig.ssh.connected
+                              ? 'Connected'
+                              : 'Disconnected',
+                          style: TextStyle(
+                            color: AppConfig.ssh.connected
+                                ? Colors.green
+                                : Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                      ),
                       const SizedBox(height: 20),
                       Center(
                         child: TextButton(
