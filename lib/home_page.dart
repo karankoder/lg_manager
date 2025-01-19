@@ -16,6 +16,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'Rebuilding HomePage and connectionStatus is ${AppConfig.ssh.connected}');
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -29,13 +31,11 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              setState(() {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const LGConnectionPage()),
-                );
-              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LGConnectionPage()),
+              );
             },
           ),
         ],
@@ -152,6 +152,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               _buildButton(
                 onPressed: () {
+                  AppConfig.lg.relaunch();
                   setState(() {});
                 },
                 icon: const Icon(Icons.refresh),
@@ -166,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                     'Reboot',
                     'Are you sure you want to reboot?',
                     () {
-                      // Reboot logic
+                      AppConfig.lg.reboot();
                       Navigator.of(context).pop();
                     },
                   );
@@ -183,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                     'Power Off',
                     'Are you sure you want to power off?',
                     () {
-                      // Power Off logic
+                      AppConfig.lg.poweroff();
                       Navigator.of(context).pop();
                     },
                   );
@@ -195,7 +196,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               _buildButton(
                 onPressed: () {
-                  // Set Refresh logic
+                  AppConfig.lg.setRefresh();
                 },
                 icon: const Icon(Icons.update),
                 label: const Text('Set Refresh'),
@@ -204,7 +205,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 10),
               _buildButton(
                 onPressed: () {
-                  // Reset Refresh logic
+                  AppConfig.lg.resetRefresh();
                 },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Reset Refresh'),
@@ -238,29 +239,27 @@ class _HomePageState extends State<HomePage> {
           const Text(
             'Control KML and logos',
             style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black), // Changed text color to black
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
           ),
           const SizedBox(height: 20),
           Column(
             children: [
               _buildButton(
-                onPressed: () async {
-                  await AppConfig.lg.getScreenAmount();
+                onPressed: () {
+                  AppConfig.lg.setLogos();
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Set LG Logo'),
-                color: const Color(0xFF3B83F6), // Blue
+                color: const Color(0xFF3B83F6),
               ),
               const SizedBox(height: 10),
               _buildButton(
                 onPressed: () {
-                  // Remove LG Logo logic
+                  AppConfig.lg.clearKml(keepLogos: false);
                 },
                 icon: const Icon(Icons.clear),
                 label: const Text('Clear Logos'),
-                color: const Color(0xFFF55347), // Red
+                color: const Color(0xFFF55347),
               ),
               const SizedBox(height: 20),
               _buildButton(
@@ -283,7 +282,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               _buildButton(
                 onPressed: () {
-                  // Clear KMLs logic
+                  AppConfig.lg.clearKml(keepLogos: true);
                 },
                 icon: const Icon(Icons.clear),
                 label: const Text('Clear KMLs'),

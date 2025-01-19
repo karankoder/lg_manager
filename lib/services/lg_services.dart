@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:async';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utility/config.dart';
 import '../entities/kml_entity.dart';
 import '../entities/overlay.dart';
 
@@ -63,13 +61,13 @@ class LGService {
       try {
         await _client.execute(query.replaceAll('{{cmd}}', clearCmd));
         await _client.execute(query.replaceAll('{{cmd}}', cmd));
+        await reboot();
       } catch (e) {
         // ignore: avoid_print
+        print('error occured');
         print(e);
       }
     }
-
-    await reboot();
   }
 
   Future<void> resetRefresh() async {
@@ -189,8 +187,14 @@ class LGService {
       query +=
           " && echo '${kml.body}' > /var/www/html/kml/slave_$logoScreen.kml";
     }
-
-    await _client.execute(query);
+    try {
+      await _client.execute(query);
+    } catch (e) {
+      print('error occured in clearKml');
+      // ignore: avoid_print
+      print(e);
+    }
+    // await _client.execute(query);
   }
 
   Future<void> setLogos({
@@ -210,9 +214,10 @@ class LGService {
       if (result != null) {
         screenAmount = int.parse(result);
       }
-
+      print('screenAmount: $screenAmount');
       await sendKMLToSlave(firstScreen, kml.body);
     } catch (e) {
+      print('error occured in set logos');
       // ignore: avoid_print
       print(e);
     }
@@ -223,6 +228,7 @@ class LGService {
       await _client
           .execute("echo '$content' > /var/www/html/kml/slave_$screen.kml");
     } catch (e) {
+      print('error occured in sendKMLToSlave');
       // ignore: avoid_print
       print(e);
     }
