@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utility/config.dart';
+import '../services/lg_services.dart';
 
 class LGConnectionPage extends StatefulWidget {
   const LGConnectionPage({super.key});
@@ -53,6 +54,7 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
       _isConnecting = true;
     });
     await AppConfig.ssh.connect();
+    AppConfig.lg = LGService(AppConfig.ssh.client);
     setState(() {
       _isConnecting = false;
     });

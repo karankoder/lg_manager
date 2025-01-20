@@ -63,7 +63,6 @@ class LGService {
       } catch (e) {
         // ignore: avoid_print
         print('error occured');
-        print(e);
       }
     }
   }
@@ -178,7 +177,6 @@ class LGService {
     try {
       await _client.execute(query);
     } catch (e) {
-      print('error occured in clearKml');
       // ignore: avoid_print
       print(e);
     }
@@ -201,10 +199,9 @@ class LGService {
       if (result != null) {
         screenAmount = int.parse(result);
       }
-      print('screenAmount: $screenAmount');
+
       await sendKMLToSlave(firstScreen, kml.body);
     } catch (e) {
-      print('error occured in set logos');
       // ignore: avoid_print
       print(e);
     }
@@ -216,6 +213,7 @@ class LGService {
           await _client.execute('echo "search=$placeName" >/tmp/query.txt');
       return execResult;
     } catch (e) {
+      //ignore: avoid_print
       print('An error occurred while executing the command: $e');
       return null;
     }
@@ -226,59 +224,17 @@ class LGService {
       await _client
           .execute("echo '$content' > /var/www/html/kml/slave_$screen.kml");
     } catch (e) {
-      print('error occured in sendKMLToSlave');
       // ignore: avoid_print
       print(e);
     }
   }
 
-  String orbitBalloon(
-    String cityImage,
-  ) {
-    return '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
-<Document>
- <name>About Data</name>
- <Style id="about_style">
-   <BalloonStyle>
-     <textColor>ffffffff</textColor>
-     <text>
-        <h1>Kolkata</h1>
-        <h1>Karan</h1>
-        <img src="$cityImage" alt="City" width="300" height="200" />
-     </text>
-     <bgColor>ff15151a</bgColor>
-   </BalloonStyle>
- </Style>
- <Placemark id="ab">
-   <description>
-   </description>
-   <LookAt>
-  <longitude>88.3639</longitude><latitude>22.5726</latitude>
-     <heading>0</heading>
-     <tilt>0</tilt>
-     <range>200</range>
-   </LookAt>
-   <styleUrl>#about_style</styleUrl>
-   <gx:balloonVisibility>1</gx:balloonVisibility>
-   <Point>
-     <coordinates>88.3639,22.5726,0</coordinates>
-   </Point>
- </Placemark>
-</Document>
-</kml>''';
-  }
-
   Future<void> showOrbitBalloon() async {
-    print('heiiiy');
-
     String img = 'https://www.holidify.com/images/bgImages/KOLKATA.jpg';
-    await _client
-        .execute("echo '${orbitBalloon(img)}' > /var/www/html/kml/slave_2.kml");
+    await _client.execute(
+        "echo '${KMLEntity.orbitBalloon(img)}' > /var/www/html/kml/slave_2.kml");
     await _client.execute(
         'echo "flytoview=${KMLEntity.generateLinearString('88.3639', '22.5726', '4000', '60', '10')})}" > /tmp/query.txt');
-
-    print('hello');
   }
 
   Future<void> query(String content) async {
@@ -292,7 +248,6 @@ class LGService {
           "echo '\nhttp://lg1:81/Orbit.kml' >> /var/www/html/kmls.txt");
       return await query('playtour=Orbit');
     } catch (e) {
-      print('Error in building orbit');
       return Future.error(e);
     }
   }
@@ -301,7 +256,6 @@ class LGService {
     try {
       return await query('playtour=Orbit');
     } catch (e) {
-      print('Could not connect to host LG');
       return Future.error(e);
     }
   }
@@ -310,7 +264,6 @@ class LGService {
     try {
       return await query('exittour=true');
     } catch (e) {
-      print('Could not connect to host LG');
       return Future.error(e);
     }
   }
@@ -322,21 +275,6 @@ class LGService {
           "echo  '\nhttp://lg1:81/dummy.kml' > /var/www/html/kmls.txt");
       await _client.execute('echo "playtour=dummy" > /tmp/query.txt');
     } catch (e) {
-      print('Error in building dummy');
-      return Future.error(e);
-    }
-  }
-
-  sendKml2(String content) async {
-    try {
-      await _client.execute("echo '$content' > /var/www/html/helllo.kml");
-      await _client.execute(
-          "echo  '\nhttp://lg1:81/helllo.kml' > /var/www/html/kmls.txt");
-
-      await _client.execute(
-          'echo "flytoview=${KMLEntity.generateLinearString('72.81555865828552', '18.956721869849535', '40000', '60', '10')})}" > /tmp/query.txt');
-    } catch (e) {
-      print('Error in building dummy');
       return Future.error(e);
     }
   }

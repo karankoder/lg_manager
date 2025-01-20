@@ -17,8 +17,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'Rebuilding HomePage and connectionStatus is ${AppConfig.ssh.connected}');
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -302,34 +300,27 @@ class _HomePageState extends State<HomePage> {
       required Text label,
       required Color color}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          vertical: 8.0), // Add padding around the buttons
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width *
-            0.7, // Set width to 70% of screen width
+        width: MediaQuery.of(context).size.width * 0.7,
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(30), // Make corners more circular
+              borderRadius: BorderRadius.circular(30),
             ),
-            padding: const EdgeInsets.symmetric(
-                vertical: 12.0, horizontal: 16.0), // Add left and right padding
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 label.data!,
-                style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white), // Font size and text color
+                style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
-              Icon(icon.icon,
-                  size: 24,
-                  color: Colors.white), // Increase icon size and color
+              Icon(icon.icon, size: 24, color: Colors.white),
             ],
           ),
         ),
