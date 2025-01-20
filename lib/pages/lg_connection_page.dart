@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import './utility/config.dart';
+import '../utility/config.dart';
 
 class LGConnectionPage extends StatefulWidget {
   const LGConnectionPage({super.key});
@@ -201,25 +201,42 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
                       ),
                       const SizedBox(height: 20),
                       Center(
-                        child: ElevatedButton(
-                          onPressed: _isConnecting
-                              ? null
-                              : () async {
-                                  try {
-                                    await _saveSettings();
-                                    _connectToLG();
-                                    showSnackBar(AppConfig.ssh.connected
-                                        ? 'Connected successfully!'
-                                        : 'Connection failed!');
-                                  } on TimeoutException catch (_) {
-                                    showSnackBar('Connection timed out!');
-                                  }
-                                  setState(() {});
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                          ),
-                          child: const Text('Connect to LG Rig'),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _isConnecting
+                                  ? null
+                                  : () async {
+                                      try {
+                                        await _saveSettings();
+                                        await _connectToLG();
+                                        showSnackBar(AppConfig.ssh.connected
+                                            ? 'Connected successfully!'
+                                            : 'Connection failed!');
+                                      } on TimeoutException catch (_) {
+                                        showSnackBar('Connection timed out!');
+                                      }
+                                      setState(() {});
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                              child: const Text('Connect to LG Rig'),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: AppConfig.ssh.connected
+                                  ? () {
+                                      AppConfig.lg.searchPlace('Leida');
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                              ),
+                              child: const Text('Test Connection'),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -238,12 +255,6 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Center(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text('Need help? Click here'),
-                        ),
-                      ),
                     ],
                   ),
                 ),

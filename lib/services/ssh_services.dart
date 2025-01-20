@@ -33,8 +33,6 @@ class SSHService {
         username: _username,
         onPasswordRequest: () => _passwordOrKey,
       );
-
-      await client.execute('echo "search=Lleida" >/tmp/query.txt');
       connected = true;
       return true;
     } catch (e) {

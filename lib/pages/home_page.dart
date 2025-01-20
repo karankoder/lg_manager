@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lg_manager/lg_connection_page.dart';
+import './lg_connection_page.dart';
 import 'package:lg_manager/utility/config.dart';
+import '../entities/orbit_entity.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,7 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? selectedScreen;
   bool connectionStatus = AppConfig.ssh.connected;
-  bool isSystemTab = true;
+  bool isSystemTab = false;
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +96,8 @@ class _HomePageState extends State<HomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildTabButton('System', isSystemTab),
         _buildTabButton('Manage', !isSystemTab),
+        _buildTabButton('System', isSystemTab)
       ],
     );
   }
@@ -221,8 +222,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildManageControls() {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context)
-            .scaffoldBackgroundColor, // Match card color to background color
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -263,20 +263,21 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20),
               _buildButton(
-                onPressed: () {
-                  // Send KML 1 logic
+                onPressed: () async {
+                  await AppConfig.lg.showOrbitBalloon();
                 },
                 icon: const Icon(Icons.send),
-                label: const Text('Send KML 1'),
+                label: const Text('Go to Home'),
                 color: const Color(0xFFF9C440), // Yellow
               ),
               const SizedBox(height: 10),
               _buildButton(
-                onPressed: () {
-                  // Send KML 2 logic
+                onPressed: () async {
+                  await AppConfig.lg
+                      .buildOrbit(Orbit.buildOrbit(Orbit.generateOrbitTag()));
                 },
                 icon: const Icon(Icons.send),
-                label: const Text('Send KML 2'),
+                label: const Text('Start Orbit'),
                 color: const Color(0xFF3B83F6), // Blue
               ),
               const SizedBox(height: 20),
