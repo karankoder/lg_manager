@@ -48,8 +48,8 @@ class KMLEntity {
    <BalloonStyle>
      <textColor>ffffffff</textColor>
      <text>
+        <h1>Karan Kumar Das</h1>
         <h1>Kolkata</h1>
-        <h1>Karan</h1>
         <img src="$cityImage" alt="City" width="300" height="200" />
      </text>
      <bgColor>ff15151a</bgColor>
@@ -72,5 +72,64 @@ class KMLEntity {
  </Placemark>
 </Document>
 </kml>''';
+  }
+
+  static String newKML() {
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Static Beauty - Delhi</name>
+    <Style id="fancyPlacemark">
+      <IconStyle>
+        <color>ff00ffff</color> <!-- Cyan icon -->
+        <scale>1.5</scale>
+        <Icon>
+          <href>https://maps.google.com/mapfiles/kml/shapes/star.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <color>ffffaa00</color> <!-- Golden label -->
+        <scale>1.2</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="colorfulPolygon">
+      <PolyStyle>
+        <color>7dff0000</color> <!-- Semi-transparent red -->
+        <outline>1</outline>
+      </PolyStyle>
+      <LineStyle>
+        <color>ff0000ff</color> <!-- Blue outline -->
+        <width>2</width>
+      </LineStyle>
+    </Style>
+    <Placemark>
+      <name>Peaceful Point</name>
+      <description>A serene location for relaxation in Delhi.</description>
+      <styleUrl>#fancyPlacemark</styleUrl>
+      <Point>
+        <coordinates>77.2090,28.6139,0</coordinates> <!-- Delhi, India -->
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Artistic Area</name>
+      <description>A colorful polygon to enhance this location.</description>
+      <styleUrl>#colorfulPolygon</styleUrl>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              77.2085,28.6135,0
+              77.2095,28.6135,0
+              77.2095,28.6143,0
+              77.2085,28.6143,0
+              77.2085,28.6135,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>
+''';
   }
 }

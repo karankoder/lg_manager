@@ -4,8 +4,8 @@ class Orbit {
     int orbit = 0;
     String content = '';
     String range = '4500';
-    double latvalue = 22.5726;
-    double longvalue = 88.3639;
+    double latvalue = 25.267878;
+    double longvalue = 82.990494;
     while (orbit <= 36) {
       if (heading >= 360) heading -= 360;
       content += '''

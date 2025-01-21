@@ -54,7 +54,9 @@ class _LGConnectionPageState extends State<LGConnectionPage> {
       _isConnecting = true;
     });
     await AppConfig.ssh.connect();
-    AppConfig.lg = LGService(AppConfig.ssh.client);
+    if (AppConfig.ssh.connected) {
+      AppConfig.lg = LGService(AppConfig.ssh.client);
+    }
     setState(() {
       _isConnecting = false;
     });

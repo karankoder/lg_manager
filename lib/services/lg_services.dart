@@ -268,12 +268,14 @@ class LGService {
     }
   }
 
-  sendKml(String content) async {
+  sendKml() async {
     try {
-      await _client.execute("echo '$content' > /var/www/html/dummy.kml");
+      await _client
+          .execute("echo '${KMLEntity.newKML()}' > /var/www/html/karan.kml");
       await _client.execute(
-          "echo  '\nhttp://lg1:81/dummy.kml' > /var/www/html/kmls.txt");
-      await _client.execute('echo "playtour=dummy" > /tmp/query.txt');
+          "echo  '\nhttp://lg1:81/karan.kml' > /var/www/html/kmls.txt");
+      return await query(
+          'flytoview=${KMLEntity.generateLinearString('77.2090', '28.6139', '400', '60', '10')})}');
     } catch (e) {
       return Future.error(e);
     }

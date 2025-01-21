@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                   await AppConfig.lg.showOrbitBalloon();
                 },
                 icon: const Icon(Icons.send),
-                label: const Text('Go to Home'),
+                label: const Text('Go to Kolkata'),
                 color: const Color(0xFFF9C440), // Yellow
               ),
               const SizedBox(height: 10),
@@ -276,7 +276,16 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: const Icon(Icons.send),
                 label: const Text('Start Orbit'),
-                color: const Color(0xFF3B83F6), // Blue
+                color: const Color(0xFF3B83F6),
+              ),
+              const SizedBox(height: 10),
+              _buildButton(
+                onPressed: () async {
+                  await AppConfig.lg.sendKml();
+                },
+                icon: const Icon(Icons.send),
+                label: const Text('Send Simple KML'),
+                color: const Color(0xFF4CAF50),
               ),
               const SizedBox(height: 20),
               _buildButton(
@@ -285,7 +294,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: const Icon(Icons.clear),
                 label: const Text('Clear KMLs'),
-                color: const Color(0xFF4CAF50), // Red
+                color: const Color(0xFFF9C440), // Red
               ),
             ],
           ),
